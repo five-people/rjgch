@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程施工AR放线辅助工具</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #arjs-anchor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 999;
+        }
+    </style>
+    <!-- 引入 AR.js 和 Three.js -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+</head>
+<body>
+    <!-- AR.js 相机和场景容器 -->
+    <a-scene embedded arjs>
+        <!-- 定义一个 AR 标记识别 -->
+        <a-marker preset="hiro">
+            <!-- 将放线作为虚拟物体 -->
+            <a-box position="0 0.5 0" color="#FF6347" scale="0.5 0.5 0.5"></a-box>
+            <a-text value="放线标记" position="0 1 0" scale="2 2 2" color="#FFFFFF"></a-text>
+        </a-marker>
+
+        <!-- 相机 -->
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <!-- 这里是操作界面，可以让用户输入距离、角度等信息 -->
+    <div id="arjs-anchor">
+        <button onclick="placeLine()">放线</button>
+        <label for="distance">输入距离 (米):</label>
+        <input type="number" id="distance" placeholder="例如：5" />
+        <label for="angle">输入角度 (°):</label>
+        <input type="number" id="angle" placeholder="例如：45" />
+    </div>
+
+    <script>
+        function placeLine() {
+            const distance = parseFloat(document.getElementById("distance").value);
+            const angle = parseFloat(document.getElementById("angle").value);
+
+            if (isNaN(distance) || isNaN(angle)) {
+                alert("请输入有效的距离和角度！");
+                return;
+            }
+
+            // 在AR场景中放置一个新的标记物体
+            const marker = document.createElement('a-marker');
+            marker.setAttribute('preset', 'hiro'); // 使用 Hiro 标记
+            marker.setAttribute('position', `${distance * Math.cos(angle * Math.PI / 180)} 0 ${distance * Math.sin(angle * Math.PI / 180)}`);
+
+            const box = document.createElement('a-box');
+            box.setAttribute('color', '#FF6347');
+            box.setAttribute('scale', '0.5 0.5 0.5');
+            marker.appendChild(box);
+
+            // 将放线标记添加到场景中
+            document.querySelector('a-scene').appendChild(marker);
+        }
+    </script>
+</body>
+</html>
